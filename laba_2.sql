@@ -138,9 +138,40 @@ Order by Price desc
 --по названиям магазинов в убывающем порядке.
 
 
+create view ShopsTotalInfo as 
+select Sh.NameShop, C.NameCountry, SUM(S.Quantity) as TotalBooksSold, SUM(S.Quantity * S.Price) as TotalMoney
+FROM Sales S JOIN Shops Sh ON s.Id_Shop = Sh.Id_Shop 
+join Country C on Sh.Id_Country = C.Id_Country
+GROUP BY Sh.NameShop, C.NameCountry
+
+SELECT * FROM ShopsTotalInfo
+ORDER BY NameCountry, NameShop DESC
 --10.Написать зашифрованное представление, показывающее самую
 --популярную книгу.
+
+create view EncryptView WITH ENCRYPTION AS 
+Select b.NameBook Book, s.Quantity TotalBookSold
+From Books b join Sales s on b.Id_Book=s.Id_Book
+where s.Quantity=(Select Max(s.Quantity) From Sales s)
+group by b.NameBook , s.Quantity 
+
+select * from EncryptView 
+
 --11. Написать модифицированное представление, в котором предоставляется
 --информация об авторах, имена которых начинаются с А или В.
+
+create view ABAuthorsInfo as
+SELECT a.FirstName+' '+a.LastName Author
+FROM  Authors a 
+Where a.FirstName like 'А%' or a.FirstName like 'Г%' 
+
+select * from ABAuthorsInfo
+Order by Author
+
+
 --12.Написать представление, в котором с помощью подзапросов вывести
 --названия магазинов, которые еще не продают книги вашего издательства.
+
+Select sh.NameShop Shop
+From Shops sh join Sales s on s.Id_Shop=sh.Id_Shop
+Where s.Quantity=0
