@@ -2,7 +2,7 @@
 use Publishing
 
 
-SELECT b.NameBook as 'Название книги', a.LastName+' '+a.FirstName as 'Автор' 
+SELECT b.NameBook as 'Book', a.LastName+' '+a.FirstName as 'Автор' 
 FROM
 Books b join Authors a on b.Id_Author=a.Id_Author
 WHERE a.Id_Author in
@@ -11,7 +11,7 @@ a.Id_Author
 FROM Authors a 
 ORDER BY RAND()
 )
-Order by 'Автор',b.NameBook 
+Order by 'Автор','Book'
 
 
 --2.	Показать все книги, в которых количество страниц больше 500, но меньше 650. 
@@ -21,7 +21,7 @@ from Books
 where Books.Pages>500 and Books.Pages<=650
 
 --3.	Необходимо вывести все названия книг, в которых первая буква или А, или С. 
-SELECT b.NameBook as 'Название книги' 
+SELECT b.NameBook as 'Book' 
 FROM Books b
 where b.NameBook like 'А%' or b.NameBook like 'Л%'
 Group by b.NameBook
