@@ -167,10 +167,61 @@ go
 Select * From  dbo.ShopInfoFunc(2, 2018)
 --10.Многооператорную функцию, которая возвращает количество проданных
 --книг по каждой из тематик в разрезе каждого магазина.
+
+go
+Create function GetSalesByThemInfoTable (@ShopId INT)
+Returns Table
+as Return(Select b.NameBook Book, t.NameTheme Theme, SUM(s.Quantity) Quantity
+From Books b 
+join Themes t on b.Id_Theme=t.Id_Theme
+join Sales s on s.Id_Book=b.Id_Book
+join Shops sh on sh.Id_Shop=s.Id_Shop
+Where  sh.Id_Shop =@ShopId
+Group by  t.NameTheme, b.NameBook )
+
+
+go
+
+
+Select * From dbo.GetSalesByThemInfoTable(1)
+
+
 --11.Функцию, которая по переданному названию страны выводит
 --информацию о магазине, расположенном в этой стране (Название,
 --количество проданных книг за последний год, заработанная на продаже
 --книг сумма).
+
+go
+Create Function ShopWages (@CountryName nvarchar(30), @Year int)
+Returns table
+as return
+(Select sh.NameShop Shop, SUM(S.Quantity) Sold, sum(b.Price*s.Quantity) Wage
+From Shops sh 
+join Sales s on sh.Id_Shop=s.Id_Shop
+join Country c on sh.Id_Country=c.Id_Country
+join Books b on b.Id_Book=s.Id_Book
+Where c.NameCountry=@CountryName and Year(s.DateOfSale)=@Year
+Group by sh.NameShop)
+go
+
+Select * From dbo.ShopWages ('Украина',2018)
 --12.Написать функцию, которая выводит информацию о количестве авторов,
 --живущих в разных странах (название страны передается в качестве
 --параметра).
+
+go
+Create Function AuthorsQuantity (@CountryName nvarchar(30))
+Returns Table
+as Return 
+(Select c.NameCountry Country, COUNT(a.Id_Author) Quantuty 
+From Authors a 
+join Books b on b.Id_Author=a.Id_Author
+join Sales s on s.Id_Book=b.Id_Book
+join Shops sh on sh.Id_Shop=s.Id_Shop
+join Country c on c.Id_Country=sh.Id_Country
+Where c.NameCountry=@CountryName
+Group by c.NameCountry)
+
+go
+
+Select * From AuthorsQuantity('Украина')
